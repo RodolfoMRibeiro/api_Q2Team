@@ -8,6 +8,7 @@ import (
 )
 
 func init() {
+	model.CreateDatabase()
 	model.ConnectDatabase()
 }
 
