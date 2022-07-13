@@ -1,9 +1,11 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Book struct {
-	Id          int    `json:"id"`
+	Id          int    `json:"id" gorm:"primary_key; auto_increment:false" `
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }

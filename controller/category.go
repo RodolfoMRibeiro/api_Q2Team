@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"libary/business"
+
 	"libary/model"
 	"net/http"
 
@@ -10,9 +12,9 @@ import (
 func CreateCategory(c *gin.Context) {
 	var category model.Category
 
-	data, _ := c.GetRawData()
-
-	category.SetCategory(string(data))
+	if err := c.ShouldBind(&category); err != nil {
+		c.JSON(http.StatusBadRequest, "")
+	}
 
 	model.DB.Create(&category)
 
@@ -23,21 +25,13 @@ func FindCategory(c *gin.Context) {
 
 	var category model.Category
 	var books []model.Book
-	var bookshelf []model.Bookshelf
 
 	if err := model.DB.Where("id = ?", c.Param("id")).First(&category).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
 
-	bookshelf = findBookshelfByCategoryId(c.Param("id"))
-
-	for _, bookshelfPart := range bookshelf {
-		book := model.Book{}
-		book.FindById(bookshelfPart.Book)
-
-		books = append(books, book)
-	}
+	books = business.FindCategory(c)
 
 	c.JSON(http.StatusOK, gin.H{"category": category, "books": books})
 }
@@ -46,14 +40,15 @@ func UpdateCategory(c *gin.Context) {
 
 	var category model.Category
 	var newCategory model.Category
-	jsonElement, _ := c.GetRawData()
 
 	if err := model.DB.Where("id = ?", c.Param("id")).First(&category).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
 
-	newCategory.SetCategory(string(jsonElement))
+	if err := c.ShouldBind(&newCategory); err != nil {
+		c.JSON(http.StatusBadRequest, "")
+	}
 
 	if model.DB.Model(&category).Updates(&newCategory).RowsAffected == 0 {
 		model.DB.Create(&category)

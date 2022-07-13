@@ -1,21 +1,18 @@
 package controller
 
 import (
-	"libary/model"
+	model "libary/model"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// GET /books
-// Get all books
-
 func CreateBook(c *gin.Context) {
 	var book model.Book
 
-	data, _ := c.GetRawData()
-
-	book.SetBook(string(data))
+	if err := c.ShouldBind(&book); err != nil {
+		c.JSON(http.StatusBadRequest, "")
+	}
 
 	model.DB.Create(&book)
 
@@ -37,14 +34,15 @@ func UpdateBook(c *gin.Context) {
 
 	var book model.Book
 	var newBook model.Book
-	jsonElement, _ := c.GetRawData()
 
 	if err := model.DB.Where("id = ?", c.Param("id")).First(&book).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
 
-	newBook.SetBook(string(jsonElement))
+	if err := c.ShouldBind(&newBook); err != nil {
+		c.JSON(http.StatusBadRequest, "")
+	}
 
 	if model.DB.Model(&book).Updates(&newBook).RowsAffected == 0 {
 		model.DB.Create(&book)

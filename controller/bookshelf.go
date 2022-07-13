@@ -10,9 +10,9 @@ import (
 func CreateBookshelf(c *gin.Context) {
 	var bookshelf model.Bookshelf
 
-	data, _ := c.GetRawData()
-
-	bookshelf.SetBookshelf(string(data))
+	if err := c.ShouldBind(&bookshelf); err != nil {
+		c.JSON(http.StatusBadRequest, "")
+	}
 
 	model.DB.Create(&bookshelf)
 
@@ -34,15 +34,15 @@ func UpdateBookshelf(c *gin.Context) {
 
 	var bookshelf model.Bookshelf
 	var newBookshelf model.Bookshelf
-	jsonElement, _ := c.GetRawData()
 
 	if err := model.DB.Where("id = ?", c.Param("id")).First(&bookshelf).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
 
-	newBookshelf.SetBookshelf(string(jsonElement))
-
+	if err := c.ShouldBind(&newBookshelf); err != nil {
+		c.JSON(http.StatusBadRequest, "")
+	}
 	if model.DB.Model(&bookshelf).Updates(&newBookshelf).RowsAffected == 0 {
 		model.DB.Create(&bookshelf)
 	}
@@ -61,12 +61,4 @@ func DeleteBookshelf(c *gin.Context) {
 	model.DB.Delete(&bookshelf)
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-}
-
-func findBookshelfByCategoryId(id string) []model.Bookshelf {
-	bookshelf := &[]model.Bookshelf{}
-
-	model.DB.Where("category = ?", id).Find(bookshelf)
-
-	return *bookshelf
 }

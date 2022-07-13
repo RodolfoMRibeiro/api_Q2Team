@@ -1,16 +1,10 @@
 package main
 
 import (
-	"libary/model"
 	"libary/routes"
 
 	"github.com/gin-gonic/gin"
 )
-
-func init() {
-	model.CreateDatabase()
-	model.ConnectDatabase()
-}
 
 func main() {
 

@@ -3,7 +3,7 @@ package model
 import "encoding/json"
 
 type Category struct {
-	Id   int    `json:"id"`
+	Id   int    `json:"id" gorm:"primary_key; auto_increment:false"`
 	Name string `json:"name"`
 }
 

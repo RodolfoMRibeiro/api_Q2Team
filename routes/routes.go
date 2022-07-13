@@ -13,7 +13,6 @@ func Groups(router *gin.Engine) {
 		BookGroup.GET("/:id", controller.FindBook)
 		BookGroup.PUT("/:id", controller.UpdateBook)
 		BookGroup.DELETE("/:id", controller.DeleteBook)
-
 	}
 
 	CategoryGroup := router.Group("/category")
@@ -22,7 +21,6 @@ func Groups(router *gin.Engine) {
 		CategoryGroup.GET("/:id", controller.FindCategory)
 		CategoryGroup.PUT("/:id", controller.UpdateCategory)
 		CategoryGroup.DELETE("/:id", controller.DeleteCategory)
-
 	}
 
 	BookshelfGroup := router.Group("/bookshelf")
